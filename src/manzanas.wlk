@@ -26,7 +26,7 @@ class Manzana {
       		{ imagenSalida = color.imagen(naranja) } 
       		else if (self.cuantasPersonasEstanInfectadas().between(1,3)) 
       		{ imagenSalida = color.imagen(amarillo) } 
-      		else { imagenSalida = color.imagen(blanco) } 
+      		else { imagenSalida = color.imagen(transparente) } 
     	return imagenSalida
     }
     
@@ -40,6 +40,7 @@ class Manzana {
 		self.transladoDeUnHabitante()
 		self.simulacionContagiosDiarios()
 		// despues agregar la curacion
+		self.simulacionCuracion()
 	}
 	
 	method mudarAEstaManzana(persona) {
@@ -89,6 +90,20 @@ class Manzana {
 		personas.forEach( { persona => persona.curacion() } )
 	}
 	
+	// aislar a infectados con sintomas
+	method aislarInfectadosConSintomas() {
+		personas.forEach( { persona => 
+			if (persona.estaInfectada() and persona.presentaSintomas()) {
+				persona.estaAislada(true)
+			}
+		} )
+	}
+	
+	// mandar a la personas a que cumplar cuarentena
+	method mandarPersonasACuarentena() {
+		personas.forEach( { persona => persona.estaAislada(true) } )
+	}
+	
 	method transladoDeUnHabitante() {
 		const quienesSePuedenMudar = personas.filter({ pers => not pers.estaAislada() })
 		if (quienesSePuedenMudar.size() > 2) {
@@ -121,15 +136,17 @@ class Manzana {
 	method cuantasPersonasTienenSintomas() {
 		return personas.count( { persona => persona.presentaSintomas() } )
 	}
-
+	
+	method codigoEnPantalla() { return 0 }
 }
 
 
 object blanco { method image() = return "blanco.png"}
-object naranjaOscuro { method image() = return "naranjaOscuro.png"}
-object amarillo { method image() = return "amarillo.png"}
-object rojo {method image() = return "rojo.png"}
-object naranja { method image() = return "naranja.png"}
+object naranjaOscuro { method image() = return "advertenciaNaranjaOscuro.png"}
+object amarillo { method image() = return "advertenciaAmarillo.png"}
+object rojo {method image() = return "advertenciaRoja.png"}
+object naranja { method image() = return "advertenciaNaranja.png"}
+object transparente { method image() = return "transparente.png"}
 
 object color { 
 	method imagen(color) { return color.image() }	

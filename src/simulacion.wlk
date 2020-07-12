@@ -24,15 +24,15 @@ object simulacion {
 	
 	// retorna un booleano
 	method debeInfectarsePersona(persona,cantidadContagiadores) {  
-		var siContagia = []
+		var comoContagia
 		const chanceDeContagio = 
 		if (persona.respetaCuarentena()) { // FALTA METODO EN PERSONA: persona.respetaCuarentena() -> retorna booleano
 			self.chanceDeContagioConCuarentena() } 
 		else { 
 				self.chanceDeContagioSinCuarentena()
 			}
-		if (persona.respetaCuarentena()) { siContagia = [1] } else { siContagia = [1,2,3,4] }
-		return  siContagia.any({n => self.tomarChance(chanceDeContagio)})
+		if (cantidadContagiadores == 4) { comoContagia = cantidadContagiadores } else { comoContagia = 1 }
+		return  (1..comoContagia).any({n => self.tomarChance(chanceDeContagio)})
 		/// revisar
 			// la logica de 1 pasada si es hay un contagio o 4, va aca.
 			// (1..cantidadContagiadores).any({n => self.tomarChance(chanceDeContagio) 
@@ -76,6 +76,16 @@ object simulacion {
 		manzanas.forEach( { manzana => manzana.simulacionCuracion() } )
 	}
 	
+	// simular aislara los infectados con sintomas
+	method aislarInfectadosConSintomas() {
+		manzanas.forEach( { manzana => manzana.aislarInfectadosConSintomas() } )
+	}
+	
+	// simular que convence a las persona de hacer cuarentena
+	method converserARespectarCuarentena() {
+		manzanas.forEach( { manzana => manzana.mandarPersonasACuarentena() } )
+	}
+	
 	// retorna una manzanda al azar
 	method elegirUnaManzanaAlAzar() { 
 		return manzanas.get(0.randomUpTo(manzanas.size() - 1)) 
@@ -91,10 +101,11 @@ object simulacion {
 	
 	// simula el avance de un dia en pandemia
 	method avanzarUnDia() { 
+		manzanas.forEach( { manzana => manzana.pasarUnDia() } )
 		self.diaActual(self.diaActual() + 1)
-		self.transladoDePersonas()
-		self.propagacionContagio()
-		self.ejecutarCuracion()
+		//self.transladoDePersonas()
+		//self.propagacionContagio()
+		//self.ejecutarCuracion()
 	}
 
 	method crearManzana() {
@@ -113,8 +124,13 @@ object simulacion {
 		nuevaManzana.mudarAEstaManzana(persona)
 		nuevaManzana.mudarAEstaManzana(persona)
 		*/
-		self.personasPorManzana().times({ veces => nuevaManzana.mudarAEstaManzana(persona) })  
+		// self.personasPorManzana().times({ veces => nuevaManzana.mudarAEstaManzana(persona)})
+		self.SimularMudarMultiplesPersonasAManzana(nuevaManzana,self.personasPorManzana(),persona)
 		return nuevaManzana
+	}
+	
+	method SimularMudarMultiplesPersonasAManzana(manzana,cantidad,persona) {
+		(0..cantidad - 1).forEach({ x => manzana.mudarAEstaManzana(persona) })
 	}
 	
 	// Consultas:

@@ -24,6 +24,5 @@ class Persona {
     		self.diaQueSeInfecto(0)
     	}
     }
-      
 
 }
